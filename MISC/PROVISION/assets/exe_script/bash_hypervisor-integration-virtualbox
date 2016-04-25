@@ -1,0 +1,10 @@
+#!/bin/bash
+
+uri_isodir=/root
+mkdir /tmp/vbox
+VER=$(cat ${uri_isodir}/.vbox_version)
+mount -o loop ${uri_isodir}/VBoxGuestAdditions_$VER.iso /tmp/vbox 
+sh /tmp/vbox/VBoxLinuxAdditions.run
+umount /tmp/vbox
+rmdir /tmp/vbox
+rm ${uri_isodir}/*.iso

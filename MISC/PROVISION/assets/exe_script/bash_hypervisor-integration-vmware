@@ -1,0 +1,164 @@
+#!/bin/bash -x
+#+PURPOSE: support hypervisor-specific enablements and configs
+#+NB: insufficiently current CA info will cause connection errors to VMware repos
+
+## <global_variables> ##
+export uri_vmware_repo=""
+export uri_vmware_repo_opt_cent5="https://packages.vmware.com/tools/releases/latest/repos/vmware-tools-repo-RHEL5-10.0.5-1.el5.x86_64.rpm"
+export uri_vmware_repo_opt_cent6="https://packages.vmware.com/tools/releases/latest/repos/vmware-tools-repo-RHEL6-10.0.5-1.el6.x86_64.rpm"
+export uri_vmware_repo_opt_cent7=""
+export uri_vmtools_osp="https://github.com/vmware/open-vm-tools/files/133266/open-vm-tools-10.0.7-3227872.tar.gz"
+## </global_variables>
+## <functions> ##
+fn_lsb_bootstrap(){
+    [[ -f /etc/redhat-release ]] \
+        || [[ -f /etc/centos-release ]] \
+        && yum -y install redhat-lsb-core
+    [[ -f /etc/debian-release ]] \
+        && apt-get -y install lsb-release
+}
+fn_vmtoolsd_opt_00(){
+    # https://github.com/mitchellh/vagrant/issues/4362
+    # http://stackoverflow.com/questions/32509470/vmware-tools-fails-on-centos-6-7-minimal-with-initctl-job-failed-to-start
+    echo gcc make perl kernel-headers kernel-devel kernel-devel-$(uname -r) fuse-libs net-tools |xargs -n1 yum -y install
+}
+fn_vmtoolsd_opt_01(){
+    # http://blog.dynofu.me/post/2016/05/27/vmhgfs-fuse.html
+    # rpm -i http://vault.centos.org/7.2.1511/updates/Source/SPackages/kernel-$(uname -r).src.rpm
+    yum install -y kernel-devel-$(uname -r) build-essential autoconf libtool
+    # specious dependencies
+    #debian-oriented-dependencies: aptitude install libmspack-dev libglib2.0-dev libprocps4-dev libdnet-dev libdumbnet-dev libfuse-dev
+    yum install -y msgpack-devel
+    cd $(mktemp -d)
+    curl -kL "${uri_vmtools_osp}" -o open-vm-tools.tgz
+    tar -xzf open-vm-tools.tgz
+    cd $(basename -s.tar.gz "${uri_vmtools_osp}")
+    ./configure --without-x --without-pam --without-ssl --without-icu && make && make install
+    
+}    
+fn_vmtoolsd_opt_02(){
+    # (opt. 2) Install Upstream Vendor Packages (proprietary)
+    # prereq, update CA bundle
+    #+TODO: check for dist-release version and arch
+    [[ -n "${uri_vmware_repo}" ]] || exit 1
+    cd $(mktemp -d)
+    curl -Lko vmware-tools-repo.rpm "${uri_vmware_repo}"
+    yum -y install ./vmware-tools-repo.rpm
+    yum -y install vmware-tools-esx-nox vmware-tools-hgfs
+}
+fn_vmtoolsd_opt_03(){
+    #+REF: http://www.boche.net/blog/index.php/2015/08/09/rhel-7-open-vm-tools-and-guest-customization/
+    cd $(mktemp -d)
+    #+HINT: add VMware pkg signing keys from http://packages.vmware.com/tools/keys
+    curl -kLO https://packages.vmware.com/tools/keys/VMWARE-PACKAGING-GPG-DSA-KEY.pub
+    curl -kLO https://packages.vmware.com/tools/keys/VMWARE-PACKAGING-GPG-RSA-KEY.pub
+    rpm --import ./VMWARE-PACKAGING-GPG-DSA-KEY.pub
+    rpm --import ./VMWARE-PACKAGING-GPG-RSA-KEY.pub
+
+    #+HINT: Create the yum repository file
+    cat > /etc/yum.repos.d/vmware-tools.repo <<-EOF
+	# 
+	#+NB: this repo contains only 'open-vm-tools-deploypkg'
+	[vmware-tools]
+	name = VMware Tools
+	baseurl = http://packages.vmware.com/packages/rhel7/x86_64/
+	enabled = 1
+	gpgcheck = 1
+	EOF
+}
+fn_vmtoolsd_opt_04(){
+    [[ -e /root/linux.iso ]] || echo "wrn: vmware-tools iso not found at /root/linux.iso"
+    cd $(mktemp -d)
+    mkdir mnt
+    /sbin/losetup -fr /root/linux.iso
+    #+ASSUME: that loop0 is the next available loopback device name
+    mount /dev/loop0 ./mnt
+    find ./mnt/*.tar.gz -print0 |xargs -r -0 -n1 tar -xzf
+    ./vmware-tools-distrib/vmware-install.pl --default --force-install && echo "OK: vmtoolsd installed" || echo "ERR: vmtoolsd installation failed"
+}
+fn_vmtoolsd_opt_05(){
+    if [[ -f /etc/vmware-tools/locations ]] ;then
+        sed -i '/answer AUTO_KMODS_ENABLED /d' /etc/vmware-tools/locations 
+        sed -i '/answer AUTO_KMODS_ENABLED_ANSWER /d' /etc/vmware-tools/locations 
+        echo "answer AUTO_KMODS_ENABLED yes" | tee -a /etc/vmware-tools/locations 
+        echo "answer AUTO_KMODS_ENABLED_ANSWER yes" | tee -a /etc/vmware-tools/locations 
+    fi
+    echo -e "#\n# VMware Host-Guest Filesystem\n/sbin/modprobe vmhgfs" | tee -a /etc/rc.modules 
+    chmod +x /etc/rc.modules
+}
+fn_vmtoolsd_opt_06(){
+    /sbin/chkconfig vmware-tools on
+    /sbin/service vmware-tools restart
+}
+fn_vmtoolsd_opt_07(){
+    systemctl enable --now vmtoolsd
+}
+fn_vmtoolsd_opt_08(){
+    /sbin/chkconfig vmtoolsd on
+    /sbin/service vmtoolsd restart
+}
+fn_vmtoolsd_opt_09(){
+    yum -y install open-vm-tools
+}
+fn_vmtoolsd_opt_10(){
+    yum -y install epel-release
+}
+fn_vmtoolsd_opt_11(){
+    # https://github.com/mitchellh/vagrant/issues/4362
+    echo build-essentials linux-headers-$(uname -r) gcc make perl |xargs -n1 yum -y install 
+}
+fn_vmtoolsd_opt_12(){
+    rm -f /etc/init/vmware-tools-thinprint.conf
+    /etc/vmware-tools/services.sh start
+}
+## </functions>
+## <Main> ##
+fn_lsb_bootstrap
+osdistro=$(lsb_release -is 2>/dev/null)
+osversion=$(lsb_release -rs 2>/dev/null)
+case ${osdistro} in
+    CentOS|RedHat)
+        case ${osversion} in
+            5*)
+                uri_vmware_repo="${uri_vmware_repo_opt_cent5}"
+                fn_vmtoolsd_opt_00
+                #+TEST: '03' is unneeded
+		#+ORIG: fn_vmtoolsd_opt_03
+                fn_vmtoolsd_opt_04
+                fn_vmtoolsd_opt_05
+                fn_vmtoolsd_opt_06
+                ;;
+            6*)
+                uri_vmware_repo="${uri_vmware_repo_opt_cent6}"
+		fn_vmtoolsd_opt_10
+                fn_vmtoolsd_opt_00
+                #(alt.)fn_vmtoolsd_opt_02
+                fn_vmtoolsd_opt_04
+                fn_vmtoolsd_opt_05
+                fn_vmtoolsd_opt_12
+                ;;
+            7*)
+                uri_vmware_repo="${uri_vmware_repo_opt_cent7}"
+		#+LOG: 20160630_nga end
+		fn_vmtoolsd_opt_10
+                fn_vmtoolsd_opt_00
+                fn_vmtoolsd_opt_04
+                fn_vmtoolsd_opt_05
+                fn_vmtoolsd_opt_06
+		#+LOG: 20160630_nga end
+
+                # fn_vmtoolsd_opt_09
+                # fn_vmtoolsd_opt_07
+                ;;
+            *)
+                echo "wrn: no OSVERSION match on '${osversion}'"
+                ;;
+        esac
+        ;;
+    Ubuntu|Debian)
+        echo "wrn: not implemented yet" ;;
+    *)
+        echo "wrn: no OSDISTRO match on '${osdistro}'"
+        ;;
+esac            
+## </Main>
