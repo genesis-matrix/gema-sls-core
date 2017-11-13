@@ -5,9 +5,9 @@
 
 
 ## Jinja
-{% set uri_remote_repo = salt['pillar.get']('', 'ssh://git@github.com/genesis-matrix/genesis-pki-example.git') %}
+{% set uri_remote_repo = salt['pillar.get']('', 'ssh://git@github.com/genesis-matrix/gema-pki-example.git') %}
 {% set uri_local_repo = salt['pillar.get']('','/etc/salt/pki') %}
-{% set uri_sshkey = salt['pillar.get']('', '/vagrant/tmp/sshkey_genesis_pki') %}
+{% set uri_sshkey = salt['pillar.get']('', '/vagrant/tmp/sshkey_gema_pki') %}
 {% set id = salt['pillar.get']('', salt['grains.get']('id')) %}
 {% set branch = salt['pillar.get']('', id) %}
 {% set destructive_updates = salt['pillar.get']('', "True") %}

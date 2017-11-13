@@ -39,15 +39,6 @@ base:
 
 
 
-  # (opt.) apply machine role states
-  {%- for element in salt['grains.get']('machine_role') %}
-  'machine_role:{{ element }}':
-    - match: grain
-    - discrete.machine_role.{{ element }}
-  {% endfor %}
-
-
-
   # apply deploy pipeline integration
   {%- for element in salt['grains.get']('deploy_pipeline') %}
   'deploy_pipeline:{{ element }}':
@@ -60,6 +51,7 @@ base:
   # clean up a/ uninstall provisioning tooling
   '* and not G@machine_role:salt_minion':
     - match: compound
+    #- state.machine._spec.destroy-all-unique-state-ao-data
     - state.machine.software.salt-minion.purge-masterless-salt
 
 

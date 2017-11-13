@@ -18,7 +18,7 @@
 ## <JINJA>
 # tmpfs ramdisk
 {%- set force_immediate_mount = salt['pillar.get']('', False) %}
-{%- set uri_ramdisk_mount = salt['pillar.get']('','/srv/pillar') %}
+{%- set uri_ramdisk_mount = salt['pillar.get']('','/srv/salt/pillar') %}
 {%- set cmd_introspect_ramsize_kb_count = salt['cmd.shell']('awk \'/^MemTotal:/{print($2)}\' /proc/meminfo')|int %}
 {%- set opt_ramdisk_allocation_percent = 10 %}
 {%- set opt_ramdisk_size = salt['pillar.get']('', + (cmd_introspect_ramsize_kb_count / opt_ramdisk_allocation_percent )|round|int|string + "k") %}

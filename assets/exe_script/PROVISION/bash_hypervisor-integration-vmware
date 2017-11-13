@@ -187,7 +187,7 @@ case ${osdistro} in
                 fn_vmtoolsd_opt_12
                 ;;
 
-	    7.3.*)
+	    7.3.*|7.4.*)
 		echo "# VMware Tools (proprietary upstream vendor software)"
 		# - http://partnerweb.vmware.com/GOSIG/CentOS_7.html#Tools
                 uri_vmware_repo="${uri_vmware_repo_opt_cent7}"
