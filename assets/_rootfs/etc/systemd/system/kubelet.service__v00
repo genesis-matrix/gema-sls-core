@@ -1,0 +1,5 @@
+[Service]
+Environment=KUBELET_VERSION=v1.3.4_coreos.0
+ExecStart=/opt/bin/kubelet-wrapper \
+         --api-servers=http://127.0.0.1:8080 \
+         --config=/etc/kubernetes/manifests

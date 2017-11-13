@@ -1,0 +1,54 @@
+#!/bin/bash
+#+PURPOSE: wrapper for launching Kubernetes services via Hyperkube
+#
+#+REF: https://coreos.com/kubernetes/docs/latest/kubelet-wrapper.html
+#+REF: https://quay.io/repository/coreos/hyperkube?tab=tags
+
+set -x
+export dflt_KUBE_ACI="quay.io/coreos/hyperkube"
+export dflt_KUBE_VERSION="v1.3.7_coreos.0"
+# KUBE_EXEC options: | 
+#     apiserver controller-manager kubectl kubelet proxy scheduler
+#     federation-apiserver federation-controller-manager
+export dflt_KUBE_EXEC="kubelet" 
+export dflt_RKT_OPTS=" --net=host --debug --insecure-options=image --stage1-from-dir=stage1-fly.aci "
+
+export KUBE_ACI="${KUBE_ACI:-$dflt_KUBE_ACI}"
+export KUBE_VERSION="${KUBE_VERSION:-$dflt_KUBE_VERSION}"
+export KUBE_EXEC="${KUBE_EXEC:-$dflt_KUBE_EXEC}"
+export RKT_OPTS="${RKT_OPTS:-$dflt_RKT_OPTS}"
+
+export systemd_servicename="rkt-k8s-$(echo ${KUBE_EXEC,,} | tr -d '/')"
+mkdir -p /var/lib/etcd/default.etcd
+mkdir -p /etc/kubernetes /var/lib/kubelet /run/kubelet
+mkdir -p /var/lib/machines
+mkdir -p /etc/rkt /usr/lib/rkt /var/lib/rkt
+
+
+# clear failed units
+systemctl is-failed ${systemd_servicename} && systemctl reset-failed ${systemd_servicename}
+
+# kickstart
+systemd-run --unit=${systemd_servicename}\
+     /usr/bin/rkt run \
+     --volume rootfs-etc-kubernetes,kind=host,source=/etc/kubernetes \
+     --volume rootfs-etc-pki-tls-certs,kind=host,source=/etc/pki/tls/certs \
+     --volume rootfs-var-lib-machines,kind=host,source=/var/lib/machines \
+     --volume rootfs-var-lib-machines,kind=host,source=/var/lib/machines \
+     --volume rootfs-var-lib-kubelet,kind=host,source=/var/lib/kubelet \
+     --volume x-os-release,kind=host,source=/etc/os-release \
+     --volume rootfs-run,kind=host,source=/run \
+     --volume rootfs-usr-bin-rkt,kind=host,source=/usr/bin/rkt \
+     --mount volume=rootfs-etc-kubernetes,target=/etc/kubernetes \
+     --mount volume=rootfs-var-lib-machines,target=/var/lib/machines \
+     --mount volume=rootfs-etc-pki-tls-certs,target=/etc/pki/tls/certs \
+     --mount volume=rootfs-var-lib-kubelet,target=/var/lib/kubelet \
+     --mount volume=x-os-release,target=/etc/os-release \
+     --mount volume=rootfs-run,target=/run \
+     --mount volume=rootfs-usr-bin-rkt,target=/usr/bin/rkt \
+     --trust-keys-from-https \
+     ${RKT_OPTS} \
+     ${KUBE_ACI}:${KUBE_VERSION} --exec="${KUBE_EXEC}" -- ${@}
+
+
+

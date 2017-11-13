@@ -1,0 +1,67 @@
+#!/bin/bash -x
+#+PURPOSE: support hypervisor-specific enablements and configs
+
+
+## <global_variables> ##
+uri_guestiso=/root/VBoxGuestAdditions.iso
+uri_mntdir=/tmp/vbox
+## </global_variables>
+## <functions> ##
+fn_lsb_bootstrap(){
+    [[ -f /etc/redhat-release ]] \
+        || [[ -f /etc/centos-release ]] \
+        && yum -y install redhat-lsb-core
+    [[ -f /etc/debian-release ]] \
+        && apt-get -y install lsb-release
+}
+fn_opt_04(){
+    echo kernel kernel-devel kernel-devel-$(uname -r) kernel-headers kernel-headers-$(uname -r) gcc dkms bzip2 |xargs -n1 yum install -y 2>&1  
+}
+fn_opt_05(){
+    mkdir "${uri_mntdir}"
+    mount -o loop ${uri_guestiso} "${uri_mntdir}"
+    ${uri_mntdir}/VBoxLinuxAdditions.run --nox11
+}
+fn_opt_06(){
+    # cleanup
+
+    umount "${uri_mntdir}"
+    rmdir -rf "${uri_mntdir}"
+    rm -rf ${uri_guestiso}
+    rm -f /var/log/{VB,vb}ox*.log
+}
+## </functions>
+## <Main> ##
+fn_lsb_bootstrap
+osdistro=$(lsb_release -is 2>/dev/null)
+osversion=$(lsb_release -rs 2>/dev/null)
+case ${osdistro} in
+    CentOS|RedHat)
+        case ${osversion} in
+            5*)
+		echo "match: ${osdistro}:${osversion}"
+		fn_opt_04
+		fn_opt_05
+                ;;
+            6*)
+		echo "match: ${osdistro}:${osversion}"
+		fn_opt_04
+		fn_opt_05
+                ;;
+            7*)
+		echo "match: ${osdistro}:${osversion}"
+		fn_opt_04
+		fn_opt_05
+                ;;
+            *)
+                echo "wrn: no OSVERSION match on '${osversion}'"
+                ;;
+        esac
+        ;;
+    Ubuntu|Debian)
+        echo "wrn: not implemented yet" ;;
+    *)
+        echo "wrn: no OSDISTRO match on '${osdistro}'"
+        ;;
+esac            
+## </Main>

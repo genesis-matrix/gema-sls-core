@@ -20,7 +20,3 @@
 
 
 
-# apply salt-formula
-"1E8D994B-18C9-4C85-B033-DAF42179F150":
-  salt.function:
-    - name: state

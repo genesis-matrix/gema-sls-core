@@ -1,0 +1,17 @@
+##
+##
+##
+
+
+
+# notes
+{#-
+ - these are states for working with services (aka applications)
+ - for some there are salt modules for integration, but in some cases REST calls are used
+ - these should all be idempotent, (non-idempotent invocations should only live in "MISC.NONIDEMP"
+ - the paths include company and product name to disambiguaty product names while keeping the heirarchy shallow. Not ideal for discovery but regarded as a worthwhile measure.
+#}
+
+
+
+## EOF

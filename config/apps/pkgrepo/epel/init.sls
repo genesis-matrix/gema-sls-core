@@ -1,7 +1,0 @@
-##
-##
-
-
-include:
-  - .repo-add-epel
-

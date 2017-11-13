@@ -3,30 +3,44 @@
 ##
 
 
+
+##_META:
+##  Purpose: apply hypervisor integration states
+##  Description:
+##    - the 'virtual' detection appears to be unreliable during some stages of the packer image build process
+##    - as a workaround, the virtual grain is also set in the minion.conf file passed to Packer for provisioning
+##    - configs are derived from the grains in the minion.conf file provided to Packer, not from the roster files, which are used by vagrant
+##    - 'minion.conf__v00' is for virtualbox, 'minion.conf__v01' is for VMware
+##    - this file is seperated from the top_GEMA.sls to ease inclusion of non-idempotent PROVISION-time configuration changes
+##    - organized around:
+##      - hypervisor
+##      - deploy pipeline
+##      - provision_states
+##      - machine_role
+##
+
+
+
+#
 base:
-  # apply basics states
-
-
-
-  # apply hypervisor integration states
-  "virtual:{{ salt['grains.get']('virtual') }}":
+  # hypervisor integration
+  "virtual:{{ salt['grains.get']('virtual', 'physical') | lower() }}":
     - match: grain
-    ##+NB: the 'virtual' detection appears to be unreliable during some stages of the packer image build process
-    #+ORIG: - MISC.PROVISION.hypervisor-integration-{{ salt['grains.get']('virtual') | lower() }}
-    - MISC.PROVISION.hypervisor-integration-vmware
+    - state.machine.sysint.hypervisor-guest.hypervisor-integration-{{ salt['grains.get']('virtual', 'physical') | lower() }}
+
 
 
   # apply provision states
-  {% for element in salt['grains.get']('PROVISION') %}
-  'PROVISION:{{ element }}':
+  {%- for element in salt['grains.get']('provision_states') %}
+  'provision_states:{{ element }}':
     - match: grain
-    - MISC.PROVISION.{{ element }}
+    - {{ element }}
   {% endfor %}
 
 
 
-  # apply mahine role states
-  {% for element in salt['grains.get']('machine_role') %}
+  # (opt.) apply machine role states
+  {%- for element in salt['grains.get']('machine_role') %}
   'machine_role:{{ element }}':
     - match: grain
     - discrete.machine_role.{{ element }}
@@ -34,18 +48,20 @@ base:
 
 
 
-  # apply cleanup a/o hand-off prep states
-  {% for element in salt['grains.get']('provision_target') %}
-  'provision_target:{{ element }}':
+  # apply deploy pipeline integration
+  {%- for element in salt['grains.get']('deploy_pipeline') %}
+  'deploy_pipeline:{{ element }}':
     - match: grain
-    - MISC.PROVISION.provision-target-{{ element }}
-  {% endfor %}  
+    - state.machine.sysint.deploy-pipeline.{{ element }}
+  {% endfor %}
 
 
 
   # clean up a/ uninstall provisioning tooling
-  '*':
-    - MISC.PROVISION.purge-masterless-salt
+  '* and not G@machine_role:salt_minion':
+    - match: compound
+    - state.machine.software.salt-minion.purge-masterless-salt
 
 
 
+## EOF
