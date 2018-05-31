@@ -14,7 +14,7 @@ fn_lsb_bootstrap(){
     if [[ -f /etc/redhat-release ]] || [[ -f /etc/centos-release ]] ;then
 	yum -y install redhat-lsb-core
     elif [[ -f /etc/debian-release ]] ;then
-        apt-get -y install lsb-release
+	apt-get -y install lsb-release
     fi
 }
 fn_vmtoolsd_opt_00(){
@@ -41,8 +41,8 @@ fn_vmtoolsd_opt_01(){
     cp -au /usr/lib64/pkgconfig/msgpack.pc /usr/lib64/pkgconfig/libmspack.pc
     echo "</WORKAROUND>"
     ./configure --verbose --without-x --without-pam --without-ssl --without-icu --without-procps --without-dnet  && make && make modules
-    
-}    
+
+}
 fn_vmtoolsd_opt_02(){
     # (opt. 2) Install Upstream Vendor Packages (proprietary)
     # prereq, update CA bundle
@@ -64,7 +64,7 @@ fn_vmtoolsd_opt_03(){
 
     #+HINT: Create the yum repository file
     cat > /etc/yum.repos.d/vmware-tools.repo <<-EOF
-	# 
+	#
 	#+NB: this repo contains only 'open-vm-tools-deploypkg'
 	[vmware-tools]
 	name = VMware Tools
@@ -90,11 +90,11 @@ fn_vmtoolsd_opt_05(){
     local tmp_uri="/etc/vmware-tools/locations"
     mkdir -p $(dirname "${tmp_uri}")
     touch "${tmp_uri}"
-    sed -i '/answer AUTO_KMODS_ENABLED /d' /etc/vmware-tools/locations 
-    sed -i '/answer AUTO_KMODS_ENABLED_ANSWER /d' /etc/vmware-tools/locations 
-    echo "answer AUTO_KMODS_ENABLED yes" | tee -a /etc/vmware-tools/locations 
-    echo "answer AUTO_KMODS_ENABLED_ANSWER yes" | tee -a /etc/vmware-tools/locations 
-    echo -e "#\n# VMware Host-Guest Filesystem\n/sbin/modprobe vmhgfs" | tee -a /etc/rc.modules 
+    sed -i '/answer AUTO_KMODS_ENABLED /d' /etc/vmware-tools/locations
+    sed -i '/answer AUTO_KMODS_ENABLED_ANSWER /d' /etc/vmware-tools/locations
+    echo "answer AUTO_KMODS_ENABLED yes" | tee -a /etc/vmware-tools/locations
+    echo "answer AUTO_KMODS_ENABLED_ANSWER yes" | tee -a /etc/vmware-tools/locations
+    echo -e "#\n# VMware Host-Guest Filesystem\n/sbin/modprobe vmhgfs" | tee -a /etc/rc.modules
     chmod +x /etc/rc.modules
 }
 fn_vmtoolsd_opt_06(){
@@ -116,7 +116,7 @@ fn_vmtoolsd_opt_10(){
 }
 fn_vmtoolsd_opt_11(){
     # https://github.com/mitchellh/vagrant/issues/4362
-    echo build-essentials linux-headers-$(uname -r) gcc make perl |xargs -n1 yum -y install 
+    echo build-essentials linux-headers-$(uname -r) gcc make perl |xargs -n1 yum -y install
 }
 fn_vmtoolsd_opt_12(){
     rm -f /etc/init/vmware-tools-thinprint.conf
@@ -135,7 +135,7 @@ fn_vmtoolsd_opt_16(){
     echo '.host:/ /vagrant vmhgfs defaults,allow_other,auto_unmount 0 0' | tee -a /etc/fstab
 }
 fn_vmtoolsd_opt_17(){
-    systemctl restart vmtoolsd || service vmware-tools restart 
+    systemctl restart vmtoolsd || service vmware-tools restart
 }
 fn_vmtoolsd_opt_18(){
     vmware-config-tools.pl -d
@@ -192,17 +192,17 @@ osdistro=$(lsb_release -is 2>/dev/null)
 osversion=$(lsb_release -rs 2>/dev/null)
 case ${osdistro} in
     CentOS|RedHat)
-        case ${osversion} in
-            5*)
-                uri_vmware_repo="${uri_vmware_repo_opt_cent5}"
-                fn_vmtoolsd_opt_00
-                fn_vmtoolsd_opt_04
-                fn_vmtoolsd_opt_05
-                fn_vmtoolsd_opt_06
-                ;;
+	case ${osversion} in
+	    5*)
+		uri_vmware_repo="${uri_vmware_repo_opt_cent5}"
+		fn_vmtoolsd_opt_00
+		fn_vmtoolsd_opt_04
+		fn_vmtoolsd_opt_05
+		fn_vmtoolsd_opt_06
+		;;
 
-            6*)
-                uri_vmware_repo="${uri_vmware_repo_opt_cent6}"
+	    6*)
+		uri_vmware_repo="${uri_vmware_repo_opt_cent6}"
 		fn_vmtoolsd_opt_10
                 fn_vmtoolsd_opt_00
                 # (alt.)fn_vmtoolsd_opt_02
@@ -231,30 +231,30 @@ case ${osdistro} in
                 fn_vmtoolsd_opt_06
                 ;;
 
-            7|7.0*|7.1.*|7.2.*)
+	    7*)
+		# All versions CentOS 7 after 7.2*
 		echo "# VMware Tools (proprietary upstream vendor software)"
 		# - http://partnerweb.vmware.com/GOSIG/CentOS_7.html#Tools
-                uri_vmware_repo="${uri_vmware_repo_opt_cent7}"
-	    	fn_vmtoolsd_opt_10
-                fn_vmtoolsd_opt_00
-	    	fn_vmtoolsd_opt_13
-                fn_vmtoolsd_opt_04
-                fn_vmtoolsd_opt_05
-                fn_vmtoolsd_opt_06
-                fn_vmtoolsd_opt_07
-                fn_vmtoolsd_opt_14
-                fn_vmtoolsd_opt_18
+		uri_vmware_repo="${uri_vmware_repo_opt_cent7}"
+		fn_vmtoolsd_opt_20
+		fn_vmtoolsd_opt_10
+		fn_vmtoolsd_opt_13
+		fn_vmtoolsd_opt_14
+		fn_vmtoolsd_opt_00
+		fn_vmtoolsd_opt_19
+		fn_vmtoolsd_opt_05
+		fn_vmtoolsd_opt_06
 		;;
 
-            *)
-                echo "wrn: no OSVERSION match on '${osversion}'"
-                ;;
-        esac
-        ;;
+	    *)
+		echo "wrn: no OSVERSION match on '${osversion}'"
+		;;
+	esac
+	;;
     Ubuntu|Debian)
-        echo "wrn: not implemented yet" ;;
+	echo "wrn: not implemented yet" ;;
     *)
-        echo "wrn: no OSDISTRO match on '${osdistro}'"
-        ;;
-esac            
+	echo "wrn: no OSDISTRO match on '${osdistro}'"
+	;;
+esac
 ## </Main>
