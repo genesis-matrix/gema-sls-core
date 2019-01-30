@@ -7,7 +7,7 @@
 ##
 include:
   - state.machine.software.salt-minion
-  - state.machine.software.python.infratest-module
+  - state.machine.software.python.mods-infratest
 
 
 

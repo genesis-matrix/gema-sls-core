@@ -34,6 +34,15 @@ work-around 2:
       - git
       - GitPython
       - MySQL-python
+      - python2-pip
+
+
+
+#
+"5D4E9790-491D-419C-8AFB-290EDB001403":
+  pip.installed:
+    - name: setuptools
+    - upgrade: True
 
 
 
@@ -41,8 +50,6 @@ work-around 2:
 "DCF6981C-90AB-45CC-A3B9-95121929AA18":
   pkg.installed:
     - name: salt-master
-    - prereq:
-      - pkg: "2252105E-A496-4118-B98D-5594663D4E69"
 
 
 
