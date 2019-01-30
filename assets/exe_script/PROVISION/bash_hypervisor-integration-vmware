@@ -161,6 +161,29 @@ fn_vmtoolsd_opt_20(){
     echo nameserver 8.8.8.8 >> /etc/resolv.conf
     echo options timeout:1 rotate >> /etc/resolv.conf
 }
+fn_vmtoolsd_opt_21(){
+    #ref: https://github.com/mvermaes/centos-vmware-tools
+
+    #notes-
+    #Install the open source tools package
+    #This provides all VMware functionality except for the HGFS driver required for synced folders:
+    sudo yum -y install open-vm-tools
+    #Install build dependencies
+    sudo yum -y install perl gcc fuse make kernel-devel net-tools policycoreutils-python
+    #Mount the installer iso and extract it to /tmp
+    mkdir -p /tmp/vmware /tmp/vmware-archive
+    sudo mount -o loop /vagrant/linux.iso /tmp/vmware
+    TOOLS_PATH="`ls /tmp/vmware/VMwareTools-*.tar.gz`"
+    tar xzf ${TOOLS_PATH} -C /tmp/vmware-archive
+    #Install VMware Tools
+    #Both --force-install and --default are required to avoid prompting, as we have already installed open-vm-tools. See https://kb.vmware.com/kb/2126368 for more details:
+    sudo /tmp/vmware-archive/vmware-tools-distrib/vmware-install.pl --force-install --default
+    #Cleanup
+    sudo umount /tmp/vmware
+    rm -rf /tmp/vmware /tmp/vmware-archive /vagrant/*.iso
+    # linux.iso can also be removed from the host if still present (MacOS)
+
+}
 ## </functions>
 ## <Main> ##
 fn_lsb_bootstrap
@@ -187,7 +210,10 @@ case ${osdistro} in
                 fn_vmtoolsd_opt_12
                 ;;
 
-	    7.3.*|7.4.*|7.5.*)
+	    7.5.*)
+		fn_vmtoolsd_opt_21
+		;;
+	    7.3.*|7.4.*)
 		echo "# VMware Tools (proprietary upstream vendor software)"
 		# - http://partnerweb.vmware.com/GOSIG/CentOS_7.html#Tools
                 uri_vmware_repo="${uri_vmware_repo_opt_cent7}"
