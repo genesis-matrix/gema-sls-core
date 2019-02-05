@@ -14,7 +14,7 @@
     - name: yum-config-manager --add-repo https://repo.saltstack.com/yum/rhel{{ osmajor }}/saltstack-rhel{{ osmajor }}.repo
 #+HINT: Update packages using 'default = yes' in order to acquire and mark the repo keys trusted.
 "144be4c2-3136-4270-bfc1-d626ae77c932":
-  pkg.uptodate
+  pkg.uptodate: []
 
 
 {% endif %}

@@ -3,5 +3,5 @@
 
 
 include:
-  - ..repo-add-epel
+  - .repo-add-epel
 
