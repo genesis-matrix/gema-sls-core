@@ -168,12 +168,13 @@ fn_vmtoolsd_opt_21(){
     #Install the open source tools package
     #This provides all VMware functionality except for the HGFS driver required for synced folders:
     sudo yum -y install open-vm-tools
+    systemctl enable open-vm-tools
     #Install build dependencies
     sudo yum -y install perl gcc fuse make kernel-devel net-tools policycoreutils-python
     #Mount the installer iso and extract it to /tmp
     mkdir -p /tmp/vmware /tmp/vmware-archive
     sudo mount -o loop /vagrant/linux.iso /tmp/vmware
-    TOOLS_PATH="`ls /tmp/vmware/VMwareTools-*.tar.gz`"
+    TOOLS_PATH="$(ls /tmp/vmware/VMwareTools-*.tar.gz)"
     tar xzf ${TOOLS_PATH} -C /tmp/vmware-archive
     #Install VMware Tools
     #Both --force-install and --default are required to avoid prompting, as we have already installed open-vm-tools. See https://kb.vmware.com/kb/2126368 for more details:
@@ -182,7 +183,7 @@ fn_vmtoolsd_opt_21(){
     sudo umount /tmp/vmware
     rm -rf /tmp/vmware /tmp/vmware-archive /vagrant/*.iso
     # linux.iso can also be removed from the host if still present (MacOS)
-
+    systemctl enable vmtoolsd || chkconfig on open-vm-tools
 }
 ## </functions>
 ## <Main> ##
@@ -210,7 +211,10 @@ case ${osdistro} in
                 fn_vmtoolsd_opt_12
                 ;;
 
-	    7.5.*)
+	    7.6|7.6.*)
+		fn_vmtoolsd_opt_21
+		;;
+	    7.5|7.5.*)
 		fn_vmtoolsd_opt_21
 		;;
 	    7.3.*|7.4.*)

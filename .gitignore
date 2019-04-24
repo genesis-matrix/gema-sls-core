@@ -21,7 +21,7 @@
 # alt/aux tooling artifacts
 .vagrant
 *.html
-
+.mypy_cache/*
 
 
 # ignore secret/personal stuffs (except example files)
@@ -106,7 +106,6 @@ tmp/*
 #*.sdf
 
 # never ignore these
-!**/Utilities/**
 !**/.gitkeep
 
 
