@@ -20,7 +20,7 @@ fn_lsb_bootstrap(){
 fn_vmtoolsd_opt_00(){
     # https://github.com/mitchellh/vagrant/issues/4362
     # http://stackoverflow.com/questions/32509470/vmware-tools-fails-on-centos-6-7-minimal-with-initctl-job-failed-to-start
-    echo gcc make perl kernel-headers kernel-devel kernel-devel-$(uname -r) fuse-libs net-tools policycoreutils-python |xargs -n1 yum -y install
+    echo gcc make perl kernel-headers kernel-devel kernel-devel-$(uname -r) fuse fuse-libs net-tools policycoreutils-python |xargs -n1 yum -y install
 }
 fn_vmtoolsd_opt_01(){
     # http://blog.dynofu.me/post/2016/05/27/vmhgfs-fuse.html
@@ -194,6 +194,9 @@ case ${osdistro} in
     CentOS|RedHat)
 	case ${osversion} in
 	    5*)
+		echo "#info# OSVERSION match on '${osversion}'"
+		echo "# All CentOS 5 versions"
+		echo "# VMware Tools (proprietary upstream vendor software)"
 		uri_vmware_repo="${uri_vmware_repo_opt_cent5}"
 		fn_vmtoolsd_opt_00
 		fn_vmtoolsd_opt_04
@@ -202,6 +205,9 @@ case ${osdistro} in
 		;;
 
 	    6*)
+		echo "#info# OSVERSION match on '${osversion}'"
+		echo "# All CentOS 6 versions"
+		echo "# VMware Tools (proprietary upstream vendor software)"
 		uri_vmware_repo="${uri_vmware_repo_opt_cent6}"
 		fn_vmtoolsd_opt_10
                 fn_vmtoolsd_opt_00
