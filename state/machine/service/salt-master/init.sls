@@ -56,6 +56,14 @@
 
 
 #
+"D1FBB69A-D3B7-48F2-8855-7A559A8D3DDF":
+  pip.installed:
+    - name: setuptools >= 40.0
+    - upgrade: True
+
+
+
+#
 "9147F497-8419-4C45-B60B-32C932144EA7":
   pip.installed:
     - pkgs:
@@ -88,6 +96,23 @@
     - watch:
       - pkg: "F4642A41-685E-4F9A-BA59-A1A4A0C46D20"
       - pkg: "A30F8081-B4EE-4D64-9D20-63ED38711E1B"
+
+
+
+#
+"0D93A63F-E317-4F62-9ECF-94D6FE5F1409":
+  module.run:
+    - saltutil.sync_all: []
+    - order: last
+
+
+
+#
+"87d5666c-5478-4617-93c2-d6499a94e0ca":
+  module.run:
+    - saltutil.runner:
+      - saltutil.sync_all
+    - order: last
 
 
 
