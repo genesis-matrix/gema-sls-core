@@ -45,6 +45,17 @@
 
 
 #
+"41B69959-6DAA-4CA9-9C25-D0AA16E7E4BD":
+  pip.installed:
+    - name: setuptools >= 40
+    - upgrade: True
+    - reload_modules: True
+    - require:
+      - pkg: "5ED328D2-1879-409D-9F8A-9C9AD371CF92"
+
+
+
+#
 "9147F497-8419-4C45-B60B-32C932144EA7":
   pip.installed:
     - pkgs:
@@ -53,7 +64,7 @@
       - python-consul
       - docker-py
     - require:
-      - pkg: "5ED328D2-1879-409D-9F8A-9C9AD371CF92"
+      - pip: "41B69959-6DAA-4CA9-9C25-D0AA16E7E4BD"
 
 
 
