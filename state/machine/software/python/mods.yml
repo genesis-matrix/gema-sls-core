@@ -1,0 +1,34 @@
+##
+##
+##
+
+
+
+##_META
+##
+
+
+
+## <JINJA>
+## </JINJA>
+
+
+
+# grains.os
+CentOS:
+  # grains.osmajorrelease
+  7:
+    # grains.pythonversion[:2]|join(".")
+    "2.7":
+      # functionality lookup key
+      pycontrol:
+        - MySQL
+    "3.6":
+      git:
+        - python36-GitPython
+      mysql:
+        - python36-mysql
+
+
+
+## EOF        

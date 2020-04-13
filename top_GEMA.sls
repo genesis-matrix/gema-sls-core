@@ -22,7 +22,7 @@
     - state._.non-op
     {% for sls_path_item in sls_path_lst %}
     {% if sls_path_item is mapping %}
-    {% for sls_path_subitem, discarded_value in sls_path_item.iteritems() %}
+    {% for sls_path_subitem, discarded_value in sls_path_item.items() %}
     - {{ sls_path_subitem }}
     {% endfor %}
     {% else %}
