@@ -8,4 +8,3 @@
     - name: /etc/yum.repos.d/remi.repo
     - pattern: '^enabled=\d'
     - repl: enabled=0
-

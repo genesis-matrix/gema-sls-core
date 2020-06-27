@@ -24,12 +24,9 @@
 
 
 
-# kubernetes setup, step:01 
+# kubernetes setup, step:01
 "DBA91F17-E804-49D5-B84D-3F28FACE72BB":
 
 
 
 #
-
-
-

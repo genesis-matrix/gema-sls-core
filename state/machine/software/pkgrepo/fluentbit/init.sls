@@ -37,7 +37,7 @@ references:
     - humanname: TD Agent Bit
     - baseurl: http://packages.fluentbit.io/centos/7
     - gpgkey: http://packages.fluentbit.io/fluentbit.key
-    - gpgcheck: 1    
+    - gpgcheck: 1
 
 
 

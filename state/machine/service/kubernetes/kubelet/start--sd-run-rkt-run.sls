@@ -21,9 +21,3 @@
       - "RKT_OPTS": " --net=host --debug --insecure-options=image --stage1-from-dir=stage1-fly.aci --volume rootfs-var-lib-rkt,kind=host,source=/var/lib/rkt --mount volume=rootfs-var-lib-rkt,target=/var/lib/rkt"
       - "KUBE_ACI": ""
       - "KUBE_VERSION": ""
-
-
-
-
-
-

@@ -13,5 +13,3 @@
 "D7175801-E512-4066-9197-24E9BCCA752E":
   cmd.run:
     - name: 'for i in /opt/install-git/bin/* ;do alternatives --install /usr/bin/$(basename ${i}) $(basename ${i}) ${i} $(date --rfc-3339=date | tr -d - ) ;done'
-
-

@@ -10,4 +10,3 @@
 "e27bb94d-4b79-40e5-8854-64a0d4c2b9d2":
   service.disabled:
     - name: named
-

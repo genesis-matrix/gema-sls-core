@@ -8,7 +8,7 @@
 ##  Applicability: salt-masters, possibly only at startup
 ##  Notes:
 ##    - The changes in this state are consequential about have the potential to break things on existing systems.
-##    - Purpose: convert all active swapfs files and devices to use per-boot encryption to protect the secrets in the ramfs-backed /srv/pillar 
+##    - Purpose: convert all active swapfs files and devices to use per-boot encryption to protect the secrets in the ramfs-backed /srv/pillar
 ##    - the crypttab setup for encrypted swap will take effect automaticaly after a reboot
 ##    - the lsblk command will show if swap is stacked and encrypted
 ##    - yum install cryptsetup

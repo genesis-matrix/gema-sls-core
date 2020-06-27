@@ -8,4 +8,3 @@
     - pkgs:
       - samba
       #- samba-common
-

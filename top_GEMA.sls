@@ -17,7 +17,7 @@
 
 
 #
-{{ saltenv }}:  
+{{ saltenv }}:
   '*':
     - state._.non-op
     {% for sls_path_item in sls_path_lst %}

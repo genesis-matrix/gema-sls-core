@@ -45,7 +45,7 @@ work-around 2:
 "0AAD9BA8-F5B8-4FB3-B714-6A8C12EE5C4C--?pkg_name={{ pkg_name }}--?var_dct={{ var_dct }}":
   pkg.installed:
     - name: {{ pkg_name }}
-{%- endfor %}      
+{%- endfor %}
 
 
 

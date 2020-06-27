@@ -8,4 +8,3 @@
     - table: filter
     - chain: INPUT
     - policy: ACCEPT
-

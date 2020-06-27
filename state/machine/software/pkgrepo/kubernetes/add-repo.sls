@@ -41,7 +41,7 @@
     - baseurl: http://yum.kubernetes.io/repos/kubernetes-el7-x86_64
     - gpgkey: "{{ repokeys|join(' ') }}"
     - enable: 1
-    - gpgcheck: 1 
+    - gpgcheck: 1
     - repo_gpgcheck: 1
 
 

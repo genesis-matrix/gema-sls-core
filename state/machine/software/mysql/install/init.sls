@@ -10,4 +10,3 @@
       ##+NB: needed for mysql states
       ##+TODO: make OS-independent, 'MySQL-python' is RHEL-family specific
       - MySQL-python
-

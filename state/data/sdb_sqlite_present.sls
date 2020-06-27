@@ -19,7 +19,7 @@
   sqlite3.table_present:
     - db: /var/www/data/app.sqlite
     - schema: CREATE TABLE `users` (`username` TEXT COLLATE NOCASE UNIQUE NOT NULL, `password` BLOB NOT NULL, `salt` BLOB NOT NULL, `last_login` INT)
-  
+
 
 
 ## EOF

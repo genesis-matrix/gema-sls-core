@@ -4,4 +4,3 @@
 
 include:
   - .repo-add-epel
-

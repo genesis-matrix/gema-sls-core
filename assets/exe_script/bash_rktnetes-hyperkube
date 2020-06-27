@@ -7,10 +7,10 @@
 set -x
 export dflt_KUBE_ACI="quay.io/coreos/hyperkube"
 export dflt_KUBE_VERSION="v1.3.7_coreos.0"
-# KUBE_EXEC options: | 
+# KUBE_EXEC options: |
 #     apiserver controller-manager kubectl kubelet proxy scheduler
 #     federation-apiserver federation-controller-manager
-export dflt_KUBE_EXEC="kubelet" 
+export dflt_KUBE_EXEC="kubelet"
 export dflt_RKT_OPTS=" --net=host --debug --insecure-options=image --stage1-from-dir=stage1-fly.aci "
 
 export KUBE_ACI="${KUBE_ACI:-$dflt_KUBE_ACI}"
@@ -49,6 +49,3 @@ systemd-run --unit=${systemd_servicename}\
      --trust-keys-from-https \
      ${RKT_OPTS} \
      ${KUBE_ACI}:${KUBE_VERSION} --exec="${KUBE_EXEC}" -- ${@}
-
-
-

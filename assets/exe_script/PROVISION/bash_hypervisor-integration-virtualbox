@@ -15,7 +15,7 @@ fn_lsb_bootstrap(){
         && apt-get -y install lsb-release
 }
 fn_opt_04(){
-    echo kernel kernel-devel kernel-devel-$(uname -r) kernel-headers kernel-headers-$(uname -r) gcc dkms bzip2 |xargs -n1 yum install -y 2>&1  
+    echo kernel kernel-devel kernel-devel-$(uname -r) kernel-headers kernel-headers-$(uname -r) gcc dkms bzip2 |xargs -n1 yum install -y 2>&1
 }
 fn_opt_05(){
     mkdir "${uri_mntdir}"
@@ -63,5 +63,5 @@ case ${osdistro} in
     *)
         echo "wrn: no OSDISTRO match on '${osdistro}'"
         ;;
-esac            
+esac
 ## </Main>

@@ -27,7 +27,7 @@
     - name: docker-py
     - require:
       - pkg: "098DFD8E-AAD8-40C5-8D0C-6EC0ACFB64A8"
-        
+
 
 
 

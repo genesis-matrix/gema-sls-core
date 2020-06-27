@@ -20,6 +20,3 @@
       - salt-minion
     - prereq:
       - pkg: "299CF095-F27F-4E6C-B19B-7E5ED86C5F0A"
-
-
-

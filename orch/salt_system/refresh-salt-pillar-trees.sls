@@ -10,6 +10,3 @@
     - name: saltutil.refresh_pillar
     - tgt: 'machine_role:salt-master'
     - tgt_type: pillar
-
-
-

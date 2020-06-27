@@ -16,7 +16,3 @@
       - "RKT_OPTS": ""
       - "KUBE_ACI": ""
       - "KUBE_VERSION": ""
-
-
-
-

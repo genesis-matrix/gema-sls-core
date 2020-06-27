@@ -30,4 +30,3 @@
     - pkgs:
       - salt-minion
       - salt-master
-

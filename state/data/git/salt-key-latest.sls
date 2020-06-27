@@ -35,6 +35,3 @@
     - force_reset:    {{ destructive_updates }}
     - force_checkout: {{ destructive_updates }}
     - force_fetch:    {{ destructive_updates }}
-
-
-

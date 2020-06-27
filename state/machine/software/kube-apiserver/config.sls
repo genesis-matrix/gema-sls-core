@@ -23,6 +23,3 @@
         KUBE_SERVICE_ADDRESSES="--service-cluster-ip-range=10.254.0.0/16"
         KUBE_ADMISSION_CONTROL="--admission_control=NamespaceLifecycle,NamespaceExists,LimitRanger,SecurityContextDeny,ResourceQuota"
         KUBE_API_ARGS=""
-
-
-

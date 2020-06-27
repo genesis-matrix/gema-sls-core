@@ -7,4 +7,3 @@
     - table: filter
     - chain: INPUT
     - policy: DROP
-

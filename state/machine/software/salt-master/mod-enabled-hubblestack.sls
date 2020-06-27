@@ -23,6 +23,6 @@
 # (jinja-import) install osquery
 {% include 'state/machine/software/osquery/init.sls' with context %}
 
-  
+
 
 ## EOF

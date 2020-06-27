@@ -35,7 +35,7 @@
     - unless: "test -d /etc/salt/pki/.git && git --git-dir={{uri_local_repo}}/.git branch -r | grep -qsx '^  origin/{{branch}}$'"
 
 
-    
+
 ##
 "1D8D1CF2-7500-4600-AA2A-AE9DE9C2511B":
   salt.function:
@@ -48,8 +48,8 @@
           opts: '--all'
 
 
-    
-"81638FAC-D280-4B7B-BAAC-DD542B40B769":      
+
+"81638FAC-D280-4B7B-BAAC-DD542B40B769":
   salt.function:
     - name: git.commit
     - tgt: {{ id }}
@@ -59,7 +59,7 @@
         message: "{{ msg_autocommit }}"
 
 
-      
+
 "83D0E834-A2FB-4FCC-9EA0-D00D443D8446":
   salt.function:
     - name: git.push
@@ -81,6 +81,3 @@
 #       - state.data.git.salt-key-latest
 #     - seconds: 600 # 10mins
 #     - splay: 600   # 10min
-
-
-

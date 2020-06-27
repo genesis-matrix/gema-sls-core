@@ -29,6 +29,3 @@
   cmd.run:
     - unless: 'which rkt && rkt version | grep -qsi "rkt Version: {{ release_ver }}"'
     - name: 'cd $(mktemp -d) && tar zxf {{ uri_installmedia_stage }} && cd rkt-{{ release_tag }} && cp -puv rkt -t /usr/bin && (cp -puv manpages/* -t /usr/share/man/man1 ; sudo mandb ) && (mkdir -p /usr/lib/rkt/stage1-images ; cp *.aci -t /usr/lib/rkt/stage1-images) && (cp -puv init/systemd/* -t /etc/systemd/system || true ) && cp -puv init/systemd/tmpfiles.d/* -t /usr/lib/tmpfiles.d && cp -auv  bash_completion/* -t /etc/bash_completion.d  && ./scripts/setup-data-dir.sh'
-
-
-    

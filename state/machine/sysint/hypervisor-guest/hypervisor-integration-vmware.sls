@@ -8,6 +8,3 @@
   cmd.script:
     - name: "PROVISION/bash_hypervisor-integration-vmware"
     - source: salt://assets/exe_script/PROVISION/bash_hypervisor-integration-vmware
-
-
-

@@ -19,6 +19,3 @@
         event_data: {{ data['data'] }}
         event_stamp: {{ data['_stamp'] }}
         event_origin: {{ sls }}
-
-
-

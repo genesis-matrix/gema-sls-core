@@ -15,7 +15,7 @@
 
 
 
-# 
+#
 "3F52AA18-A93D-4FA6-AE38-0E2F658C67D6":
   pkg.installed:
     - pkgs:
@@ -27,7 +27,7 @@
       - openssh-clients
       - bzip2
       - epel-release
-      
+
 
 
 #

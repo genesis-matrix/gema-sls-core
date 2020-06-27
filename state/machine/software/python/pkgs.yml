@@ -1,3 +1,4 @@
+---
 ##
 ##
 ##
@@ -17,22 +18,22 @@
 # grains.os
 CentOS:
   # grains.osmajorrelease
-  7:
+    7:
     # grains.pythonversion[:2]|join(".")
-    "2.7":
+        '2.7':
       # functionality lookup key
-      git:
-        # preference ranked list
-        - python-pygit2
-        - GitPython
-      mysql:
-        - MySQL
-    "3.6":
-      git:
-        - python36-GitPython
-      mysql:
-        - python36-mysql
+            git:
+      # preference ranked list
+              - python-pygit2
+              - GitPython
+            mysql:
+              - MySQL
+        '3.6':
+            git:
+              - python36-GitPython
+            mysql:
+              - python36-mysql
 
 
 
-## EOF        
+## EOF
