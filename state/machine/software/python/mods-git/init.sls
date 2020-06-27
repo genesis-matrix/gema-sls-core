@@ -33,7 +33,7 @@ pkgs_by_python_ver:
 
 
 # notes on Implementation Status
-{#
+{#-
 ---  # python-pygit2
 ref: "https://github.com/saltstack/salt/issues/38630">
 work-around 1:
@@ -47,13 +47,13 @@ work-around 2:
 
 
 #
-{%- for pkg in var_dct.pkg_lst %}
-"0AAD9BA8-F5B8-4FB3-B714-6A8C12EE5C4C--?pkg={{ pkg }}":
+{%- for pkg in var_dct.python_pkg_lst %}
+"0AAD9BA8-F5B8-4FB3-B714-6A8C12EE5C4C--?pkg={{ pkg }}--?loop.index0={{ loop.index0 }}":
   pkg.installed:
     - name: {{ pkg }}
-    {%- if not loop.first %}
+    {%- if loop.nextitem is defined %}
     - onfail:
-      - pkg: "0AAD9BA8-F5B8-4FB3-B714-6A8C12EE5C4C--?pkg={{ var_dct.pkg_lst[loop.index0 - 1] }}"
+      - pkg: "0AAD9BA8-F5B8-4FB3-B714-6A8C12EE5C4C--?pkg={{ loop.nextitem }}--?loop.index0={{ loop.index0 }}"
     {%- endif %}
 {%- endfor %}
 

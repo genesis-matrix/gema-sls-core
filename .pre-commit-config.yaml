@@ -48,7 +48,7 @@ repos:
           - id: git-check
           #- id: git-dirty
           - id: markdownlint
-          #- id: shellcheck
+          - id: shellcheck
           #- id: shfmt
     - repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
       rev: master
@@ -78,6 +78,12 @@ repos:
       hooks:
           - id: black
             language_version: python3
+    - repo: https://github.com/Yelp/detect-secrets
+      rev: v0.13.1
+      hooks:
+          - id: detect-secrets
+            #args: ['--baseline', '.secrets.baseline']
+            #exclude: .*/tests/.*
 
 
 
