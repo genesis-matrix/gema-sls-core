@@ -21,7 +21,7 @@
 {#- hint: create state for diagnostic uses #}
 {% load_yaml as canary_stanza %}
 #
-"6f9e4439-adfd-482f-b59f-6f653fc99e2a":
+"6f9e4439-adfd-482f-b59f-6f653fc99e2a--?sls={{ sls }}":
   test.succeed_without_changes:
     - name: "No stanza_dct data was passed in to this template, check the var_dct value in the template rendered for diagnostic info."
 {%- endload %}
