@@ -5,96 +5,124 @@
 
 
 ##_META
+##  purpose: enable simple data-driven certificate management automation
 ##
 
 
 
 ## <JINJA>
-{%- set var_dct = salt["pillar.get"]("lookup:minion_id:" ~ opts.id, {}) %}
-{%- set _discard = var_dct.update({
-  'x509': {
-    'usage_type': ['backend', 'clientfacing'],
-    'authn_type': ['selfsigned', 'casigned'],
-    'crypto_group': salt["pillar.get"]("", var_dct.dutyinfo.ipso_key|default("") ~ "_crypto_read"),
-    'key': {
-      'uri_pfx': salt["pillar.get"]('', '/etc/pki/tls/private/'),
-      'uri_sfx': salt["pillar.get"]('', 'key'),
-      'file_mode': '640',
-    },
-    'cert': {
-      'uri_pfx': salt["pillar.get"]('', '/etc/pki/tls/certs/'),
-      'uri_sfx': salt["pillar.get"]('', 'crt'),
-      'file_mode': '644',
-    },
-    'ca': {},
-  }
-})
-%}
-{#- assemble the cv1class, used to generate the file basename #}
-{%- set _discard = var_dct.update({
-  'cv1class': [var_dct.dutyinfo.ipso_key, var_dct.dutyinfo.machine_role, "_" ~ var_dct.dutyinfo.deployenv]|join("_"),
-  })
-%}
-{#- assemble the purpose label, used to generate the file basename #}
-{%- set _discard = var_dct.x509.update({
-  'purpose_label': salt["pillar.get"]("", [var_dct.x509.usage_type|first, var_dct.x509.authn_type|first]|join("-")),
-  })
-%}
-{%- set _discard = var_dct.x509.update({
-  'basename': [var_dct.cv1class, var_dct.x509.purpose_label]|join("."),
-  })
-%}
-{%- set _discard = var_dct.x509.cert.update({
-  "uri": [var_dct.x509.cert.uri_pfx ~ var_dct.cv1class, var_dct.x509.purpose_label, var_dct.x509.cert.uri_sfx]|join(".")
-  })
-%}
-{%- set _discard = var_dct.x509.key.update({
-  "uri": [var_dct.x509.key.uri_pfx ~ var_dct.cv1class, var_dct.x509.purpose_label, var_dct.x509.key.uri_sfx]|join(".")
-  })
-%}
+{%- set var_dct = {} %}
+{%- set _discard = var_dct.update(salt["pillar.get"]("lookup:minion_id:" ~ opts.id, {})) %}
+{%- set _discard = var_dct.update(salt["pillar.get"]("lookup:sls_path:" ~ sls, {})) %}
 ## </JINJA>
 
 
 
+# notes on Implementation Status
+#{#
+
+
+
+#}#
+
+
+
+# .WIP: 
+{#
+{%- if 'x509_signing_policies' in var_dct %}
+"608d509d-cc50-44f6-8038-4a58547d49c6":
+  file.managed:
+    - name: /etc/salt/minion.d/x509_signing_policies.conf
+    - contents: |
+        {{ var_dct.x509_signing_policies | indent }}
+{%- endif %}
+#}
+
+
+
+{%- if 'x509_lst' not in var_dct %}
 #
-{% for pfx in [var_dct.x509.cert.uri_pfx, var_dct.x509.key.uri_pfx] %}
-"ea17f014-c7af-4e3a-a686-94f6a3f7ad06--?pfx={{ pfx }}--?index0={{ loop.index0 }}":
+"64a61a60-0f31-43ad-8d20-da172d89de09":
+  test.succeed_without_changes:
+    - name: "{{ var_dct }}"
+{%- else %}      
+
+
+
+{%- for x509 in var_dct.x509_lst %}
+{%- if 'key' in x509 and 'uri' in x509.key %}
+#
+"ea17f014-c7af-4e3a-a686-94f6a3f7ad06--?index0={{ loop.index0 }}":
   file.directory:
-    - name: {{ salt["file.dirname"](pfx) }}
-{% endfor %}
+    - name: {{ salt["file.dirname"](x509.key.uri) }}
+    - makedirs: True
+{%- endif %}      
 
 
 
 #
-"dc61e810-41a3-4a08-8245-32606e2ee733":
+{%- if 'key' in x509 and 'uri' in x509.key %}
+"dc61e810-41a3-4a08-8245-32606e2ee733--?index0={{ loop.index0 }}":
   x509.private_key_managed:
-    - name: {{ var_dct.x509.key.uri }}
-    - bits: 4096
-    - backup: True
-    - mode: {{ var_dct.x509.key.file_mode }}
+    - name: {{ x509.key.uri }}
+    - bits: {{ x509.key.bits|default(4096) }}
+    - backup: {{ x509.key.backup|default(True) }}
+    {{ "- group: " ~ x509.cert.crypto_group if x509.cert.crypto_group|default(None) is not none else ""}}
+    {{ "- mode: " ~ x509.key.file_mode if x509.key.file_mode|default(None) is not none else "" }}
+{%- endif %}
+
+
+
+#  
+{%- if 'cert' in x509 and 'uri' in x509.cert %}
+"ea17f014-c7af-4e3a-a686-94f6a3f7ad06--?x509.cert.uri={{ x509.cert.uri }}--?index0={{ loop.index0 }}":
+  file.directory:
+    - name: {{ salt["file.dirname"](x509.cert.uri) }}
+    - makedirs: True
+{%- endif %}
 
 
 
 #
-"230e74fb-d718-4696-a814-ecb0158dcce6":
+{%- if 'cert' in x509 and 'uri' in x509.cert %}
+"230e74fb-d718-4696-a814-ecb0158dcce6--?index0={{ loop.index0 }}":
   x509.certificate_managed:
-    - name: {{ var_dct.x509.cert.uri }}
-    - signing_private_key: {{ var_dct.x509.key.uri }}
-    - CN: ca.example.com
-    - C: US
-    - ST: DC
-    - L: Washington
-    - basicConstraints: "critical CA:true"
-    - keyUsage: "critical cRLSign, keyCertSign"
-    - subjectKeyIdentifier: hash
-    - authorityKeyIdentifier: keyid,issuer:always
-    - days_valid: 3650
-    - days_remaining: 30
-    - backup: True
-    - group: {{ var_dct.x509.crypto_group }}
-    - mode: {{ var_dct.x509.cert.file_mode }}
+    - name: {{ x509.cert.uri }}
+    {{ "- signing_policy: " ~ x509.cert.signing_policy if 'signing_policy' in x509.cert else "" }}
+    {{ "- ca_server: " ~ x509.cert.ca_server if 'ca_server' in x509.cert else "" }}    
+    # use a locally generated key to create a self-signed certificate
+    - signing_private_key: {{ x509.cert.signing_private_key|default(x509.key.uri) }}
+    # (ex.) domain.example.com
+    - CN: {{ x509.cert.cn|default("domain.example.com") }}
+    # (ex.) US
+    - C: {{ x509.cert.country|default("US") }}
+    # (ex.) DC
+    - ST: {{ x509.cert.state|default("DC") }}
+    # (ex.) Washington
+    - L: {{ x509.cert.locality|default("Washington") }} 
+    # (ex.) "critical CA:true"
+    - basicConstraints: {{ x509.cert.basicConstraints|default("critical CA:true") }}
+    # (ex.) "critical cRLSign, keyCertSign"
+    - keyUsage: {{ x509.cert.keyUsage|default("critical cRLSign, keyCertSign") }}
+    # (ex.) hash
+    - subjectKeyIdentifier: {{ x509.cert.subjectKeyIdentifier|default("hash") }}
+    # (ex.) keyid,issuer:always
+    - authorityKeyIdentifier: {{ x509.cert.authorityKeyIdentifier|default("keyid,issuer:always") }}
+    # (ex.) 3650
+    - days_valid: {{ x509.cert.days_valid|default(3650) }}
+    # (default:  30), set to 0 to disable auto-rotation
+    {{ "- days_remaining: " ~ x509.cert.days_remaining if x509.cert.days_remaining|default(None) is not none else "" }}
+    # (ex.) True
+    - backup: {{ x509.cert.backup|default(True) }}
+    {{ "- group: " ~ x509.cert.crypto_group if x509.cert.crypto_group|default(None) is not none else "" }}
+    {{ "- mode: " ~ x509.cert.file_mode if x509.cert.file_mode|default(None) is not none else "" }}
+    {%- if 'key' in x509 %}
     - require:
-      - x509: "dc61e810-41a3-4a08-8245-32606e2ee733"
+      - x509: "dc61e810-41a3-4a08-8245-32606e2ee733--?index0={{ loop.index0 }}"
+    {%- endif %}
+{%- endif %}
+{%- endfor %}
+{%- endif %}
 
 
 
