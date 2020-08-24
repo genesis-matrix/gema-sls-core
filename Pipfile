@@ -7,11 +7,15 @@ name = "pypi"
 invoke = "*"
 pipenv = "*"
 pre-commit = "*"
+commitizen = "*"
 
 [dev-packages]
 
 [requires]
+python_version = "3.6.8"
 
 [scripts]
+
+
 
 ## EOF
